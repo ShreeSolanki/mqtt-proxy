@@ -18,10 +18,29 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     try:
-        payload = json.loads(msg.payload.decode())
-        print(f"Received: {payload}")
+        d = json.loads(msg.payload.decode())
+
+        payload = {
+            "ID":                    "ENERS02A",
+            "IMEI":                  d.get("imei",   "UNKNOWN"),
+            "Voltage_B":             d.get("vb",     0.0),
+            "Voltage_Phase_Neutral": d.get("vpn",    0.0),
+            "Voltage_Phase_Phase":   d.get("vry",    0.0),
+            "Frequency_Hz":          d.get("freq",   0.0),
+            "Current_R":             d.get("ir",     0.0),
+            "Current_Y":             d.get("iy",     0.0),
+            "Current_B":             d.get("ib",     0.0),
+            "Current_Average":       d.get("i_avg",  0.0),
+            "Total_Power_W":         d.get("ptot",   0.0),
+            "Energy_kWh":            d.get("kwhr",   0.0),
+            "Timestamp":             d.get("ts",     0),
+            "Socket Allowed":        True
+        }
+
+        print(f"Forwarding: {payload}")
         r = requests.post(WEBHOOK, json=payload, timeout=10)
         print(f"→ {r.status_code} | {r.text}")
+
     except Exception as e:
         print(f"Error: {e}")
 
@@ -32,7 +51,6 @@ def start_mqtt():
     client.connect(MQTT_HOST, MQTT_PORT, keepalive=60)
     client.loop_forever()
 
-# Start MQTT in background thread when Flask starts
 t = threading.Thread(target=start_mqtt, daemon=True)
 t.start()
 
