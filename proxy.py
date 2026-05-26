@@ -34,7 +34,7 @@ def on_message(client, userdata, msg):
             "Total_Power_W":         d.get("ptot",   0.0),
             "Energy_kWh":            d.get("kwhr",   0.0),
             "Timestamp":             d.get("ts",     0),
-            "Socket_Allowed":        True
+            "Socket Allowed":        True
         }
 
         print(f"Forwarding: {payload}")
