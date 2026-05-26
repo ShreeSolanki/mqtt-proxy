@@ -1,15 +1,30 @@
-from flask import Flask, request
-import requests, os
+import paho.mqtt.client as mqtt
+import requests
+import json
+import os
 
-app = Flask(__name__)
-WEBHOOK = "https://app.geoclic-solutions.com/eco-ia/api/webhook"
+MQTT_HOST   = "broker.hivemq.com"
+MQTT_PORT   = 1883
+MQTT_TOPIC  = "meter/data"
+WEBHOOK     = "https://app.geoclic-solutions.com/eco-ia/api/webhook"
 
-@app.route("/forward", methods=["POST"])
-def forward():
-    data = request.get_json(force=True)
-    r = requests.post(WEBHOOK, json=data, timeout=10)
-    print(f"→ {r.status_code} | {r.text}")
-    return str(r.status_code), r.status_code
+def on_connect(client, userdata, flags, rc):
+    print(f"Connected to MQTT broker, rc={rc}")
+    client.subscribe(MQTT_TOPIC)
+    print(f"Subscribed to {MQTT_TOPIC}")
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+def on_message(client, userdata, msg):
+    try:
+        payload = json.loads(msg.payload.decode())
+        print(f"Received: {payload}")
+        r = requests.post(WEBHOOK, json=payload, timeout=10)
+        print(f"→ {r.status_code} | {r.text}")
+    except Exception as e:
+        print(f"Error: {e}")
+
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
+
+client.connect(MQTT_HOST, MQTT_PORT, keepalive=60)
+client.loop_forever()
