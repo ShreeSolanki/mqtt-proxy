@@ -24,21 +24,41 @@ def on_message(client, userdata, msg):
         print(f"Received: {d}", flush=True)
 
         payload = {
-            "id":                    "ENERS02A",
-            "ID":                    "ENERS02A",
-            "IMEI":                  d.get("imei",  "UNKNOWN"),
-            "Voltage_B":             d.get("vb",    0.0),
-            "Voltage_Phase_Neutral": d.get("vpn",   0.0),
-            "Voltage_Phase_Phase":   d.get("vry",   0.0),
-            "Frequency_Hz":          d.get("freq",  0.0),
-            "Current_R":             d.get("ir",    0.0),
-            "Current_Y":             d.get("iy",    0.0),
-            "Current_B":             d.get("ib",    0.0),
-            "Current_Average":       d.get("i_avg", 0.0),
-            "Total_Power_W":         d.get("ptot",  0.0),
-            "Energy_kWh":            d.get("kwhr",  0.0),
-            "Timestamp":             d.get("ts",    0),
-            "Socket Allowed":        True
+            ###########################################################################
+            # ORIGINAL GEOCLIC FIELDS (KEEP EXACT)
+            ###########################################################################
+
+            "ID": "ENERS02A",
+
+            "IMSI": d.get("imei", "UNKNOWN"),
+
+            "Total Power (Wh)": d.get("ptot", 0.0),
+
+            "Socket Allowed": True,
+
+            ###########################################################################
+            # EXTENDED TELEMETRY FIELDS
+            ###########################################################################
+
+            "Voltage_B": d.get("vb", 0.0),
+
+            "Voltage_Phase_Neutral": d.get("vpn", 0.0),
+
+            "Voltage_Phase_Phase": d.get("vpp", 0.0),
+
+            "Frequency_Hz": d.get("freq", 0.0),
+
+            "Current_R": d.get("ir", 0.0),
+
+            "Current_Y": d.get("iy", 0.0),
+
+            "Current_B": d.get("ib", 0.0),
+
+            "Current_Average": d.get("i_avg", 0.0),
+
+            "Energy_kWh": d.get("kwhr", 0.0),
+
+            "Timestamp": d.get("ts", 0)
         }
 
         print(f"Forwarding: {payload}", flush=True)
